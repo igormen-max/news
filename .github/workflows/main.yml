@@ -3,8 +3,10 @@ name: Deploy News Digest Pipeline
 on:
   push:
     branches: [main]
-  workflow_dispatch: # Позволяет запускать вручную
-
+  workflow_dispatch: 
+  schedule:
+    - cron: '0 8 * * *' # Будет запускаться каждый день в 8:00 утра по Гринвичу
+    
 jobs:
   build:
     runs-on: ubuntu-latest
