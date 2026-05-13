@@ -1,28 +1,21 @@
 name: Deploy News Digest Pipeline
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'news-digest-pipeline/**'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /srv/news_agent_001
-            git pull origin main
-            cd news-digest-pipeline
-            docker compose build
-            docker compose up -d
-            docker compose ps
+      - name: Send News to Telegram
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          echo "Запуск скрипта..."
+          # Здесь должен быть вызов вашего основного скрипта, например:
+          # python news_digest.py
