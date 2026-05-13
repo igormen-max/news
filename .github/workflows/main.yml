@@ -1,30 +1,30 @@
 name: Deploy News Digest Pipeline
 
 on:
-  workflow_dispatch:  # Позволяет запускать бота вручную кнопкой
-  schedule:
-    - cron: '0 9 * * *' # Автозапуск каждый день в 9:00 по UTC
+  push:
+    branches: [main]
+  workflow_dispatch: # Позволяет запускать вручную
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: |
-          pip install requests google-generativeai
+        run: pip install requests
 
       - name: Run News Digest Script
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python news_digest.py
+        run: |
+          # Эта команда найдет файл news_digest.py, даже если он в папке
+          FILE_PATH=$(find . -name "news_digest.py" -print -quit)
+          if [ -z "$FILE_PATH" ]; then
+            echo "Ошибка: Файл news_digest.py не найден ни в одной папке!"
+            exit 1
+          fi
+          python "$FILE_PATH"
